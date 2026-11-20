@@ -1,0 +1,39 @@
+{
+  "privacy": {
+    "instructions": "Bestimme die Datenschutzstufe des Textes. Beurteilt wird, was der Text enthält, nicht was die Aufgabe verlangt. Prüfe der Reihe nach: (1) Personenbezug: Enthält der Text Angaben zu einer bestimmten oder bestimmbaren natürlichen Person (Name, Adresse, Telefonnummer, E-Mail, Geburtsdatum, AHV-Nummer, Konto einer Privatperson, Kunden- oder Personalnummer im Zusammenhang mit einer Person, Fahrzeugkennzeichen)? Wenn nein, weiter mit (3). (2) Besondere Kategorie: Betreffen diese Angaben Gesundheit, Religion, Weltanschauung, politische oder gewerkschaftliche Ansichten, Intimsphäre, Ethnie, genetische oder biometrische Daten, Strafverfolgung oder Sanktionen oder Leistungen der sozialen Hilfe? Ja: D2, nein: D1. (3) Vertraulichkeit ohne Personenbezug: Enthält der Text vertrauliche Geschäftsinformationen (Vertragsinhalte, Preise und Konditionen, Margen, Offertsummen, interne Zahlen, internen oder proprietären Quellcode, Informationen unter Berufsgeheimnis)? Ja: D3, nein: D0. Rangfolge: D2 vor D1 vor D3 vor D0. Ein Firmenname allein ist keine Personendaten. Eine Kontaktperson einer Firma mit Name ist D1. Eine Berufsbezeichnung ohne Namen ist D0. Teilweise anonymisierte Angaben wie «Herr M., 58, wohnhaft in Bern» sind D1. Namen öffentlicher Personen sind D1. Allgemeiner Beispielcode ist D0. Bei Zweifel die höhere Stufe wählen.",
+    "criteria": {
+      "D0": "Keine Angaben zu bestimmten oder bestimmbaren Personen und keine vertraulichen Geschäftsinformationen.",
+      "D1": "Angaben zu einer bestimmten oder bestimmbaren natürlichen Person, aber keine besonderen Kategorien.",
+      "D2": "Angaben zu einer bestimmten oder bestimmbaren Person, die Gesundheit, Religion, Weltanschauung, Politik, Gewerkschaft, Intimsphäre, Ethnie, genetische oder biometrische Daten, Strafverfolgung, Sanktionen oder soziale Hilfe betreffen.",
+      "D3": "Kein Personenbezug, aber vertrauliche Geschäftsinformationen wie Vertragsinhalte, Preise, Konditionen, Margen, Offertsummen, interne Zahlen oder interner Quellcode."
+    }
+  },
+  "complexity": {
+    "instructions": "Wie viel Denkarbeit hätte eine kompetente Berufseinsteigerin für die verlangte Aufgabe? Gemessen wird nur die Denkzeit, nicht die Lesezeit. Die Länge des Textes zählt nicht. Hätte ein Fehler in der Antwort erhebliche Folgen (Geld, Gesundheit, Recht), eine Stufe höher einordnen.",
+    "criteria": [
+      "einfach: höchstens ca. 2 Minuten, ohne Nachschlagen, ein Arbeitsschritt (umformulieren, auslesen, einordnen, kurz übersetzen, Standardantwort).",
+      "mittel: ca. 2 bis 10 Minuten, Alltagswissen, zwei bis drei Schritte (Zusammenfassung eines mittellangen Textes, Briefentwurf, mehrere Felder auslesen, einfache Berechnung).",
+      "anspruchsvoll: mehr als ca. 10 Minuten oder Fachwissen zum Nachschlagen (mehrstufiges Schlussfolgern, Abwägen mehrerer Argumente, Analyse langer Dokumente mit Widersprüchen, Code über Trivialniveau)."
+    ]
+  },
+  "pii": {
+    "Name": "Enthält der Text den Namen einer natürlichen Person (auch abgekürzt wie «Herr M.»)?",
+    "Adresse": "Enthält der Text die Wohn- oder Postadresse einer natürlichen Person?",
+    "Telefon": "Enthält der Text die Telefonnummer einer natürlichen Person?",
+    "E-Mail": "Enthält der Text die E-Mail-Adresse einer natürlichen Person?",
+    "Geburtsdatum": "Enthält der Text das Geburtsdatum oder das genaue Alter einer natürlichen Person?",
+    "AHV-Nummer": "Enthält der Text eine AHV-Nummer (Sozialversicherungsnummer, Format 756.xxxx.xxxx.xx)?",
+    "IBAN oder Konto": "Enthält der Text eine IBAN oder Kontonummer einer Privatperson?",
+    "Kunden- oder Personalnummer": "Enthält der Text eine Kunden- oder Personalnummer im Zusammenhang mit einer Person?",
+    "Fahrzeugkennzeichen": "Enthält der Text ein Fahrzeugkennzeichen?",
+    "Gesundheit": "Enthält der Text Angaben zur Gesundheit einer bestimmten Person (Krankheit, Diagnose, Behandlung, Unfallfolgen)?",
+    "Religion": "Enthält der Text Angaben zur Religion einer bestimmten Person?",
+    "Weltanschauung oder Politik oder Gewerkschaft": "Enthält der Text Angaben zur Weltanschauung, zu politischen Ansichten oder zur Gewerkschaftszugehörigkeit einer bestimmten Person?",
+    "Intimsphäre": "Enthält der Text Angaben zur Intimsphäre einer bestimmten Person?",
+    "Ethnie": "Enthält der Text Angaben zur ethnischen Herkunft einer bestimmten Person?",
+    "genetisch oder biometrisch": "Enthält der Text genetische oder biometrische Daten einer bestimmten Person?",
+    "Strafverfolgung oder Sanktion": "Enthält der Text Angaben zu Strafverfahren, Verurteilungen oder Sanktionen gegen eine bestimmte Person?",
+    "soziale Hilfe": "Enthält der Text Angaben dazu, dass eine bestimmte Person Sozialhilfe oder andere Leistungen der sozialen Hilfe bezieht?",
+    "Sonstiges": "Enthält der Text sonstige Angaben, die eine natürliche Person bestimmbar machen?"
+  }
+}

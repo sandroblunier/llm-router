@@ -1,0 +1,23 @@
+# Ollama (and optionally the kev server) run on the host, not in this compose file.
+#   ROUTER_API_KEY=geheim docker compose up --build
+services:
+  llm-router:
+    build: .
+    image: llm-router:0.1.0
+    ports:
+      - "8080:8080"
+    environment:
+      ROUTER_API_KEY: ${ROUTER_API_KEY:?ROUTER_API_KEY must be set}
+      ROUTER_DECISION_BACKEND: ${ROUTER_DECISION_BACKEND:-ollama}
+      ROUTER_DECISION_OLLAMA_MODEL: ${ROUTER_DECISION_OLLAMA_MODEL:-kev}
+      ROUTER_KEV_URL: ${ROUTER_KEV_URL:-http://host.docker.internal:8009}
+      ROUTER_OLLAMA_URL: ${ROUTER_OLLAMA_URL:-http://host.docker.internal:11434}
+      ROUTER_ROUTING_CLOUD_THRESHOLD: ${ROUTER_ROUTING_CLOUD_THRESHOLD:-0.95}
+    volumes:
+      - router-data:/data
+    # needed on Linux (DGX Spark); Docker Desktop on macOS/Windows resolves it anyway
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  router-data:
