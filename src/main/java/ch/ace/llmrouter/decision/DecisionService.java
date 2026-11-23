@@ -6,7 +6,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jboss.logging.Logger;
 
-/** Step 2 of the flow: classify with the configured decision model and apply the routing policy. Fails closed. */
+/**
+ * Step 2 of the flow: classify with the configured decision model and apply the routing policy. Fails closed.
+ */
 @Singleton
 public class DecisionService {
 
@@ -38,16 +40,18 @@ public class DecisionService {
     }
 
     public Decision decide(String text) {
-        if (estimateTokens(text) > model.maxInputTokens()) {
-            return policy.unclassified(Decision.Reason.TOO_LONG);
+        int estimated = estimateTokens(text);
+        if (estimated > model.maxInputTokens()) {
+            return policy.unclassified(Decision.Reason.TOO_LONG,
+                    "estimated " + estimated + " tokens > limit " + model.maxInputTokens());
         }
         try {
             return policy.decide(model.classify(text));
         } catch (DecisionModel.InputTooLongException e) {
-            return policy.unclassified(Decision.Reason.TOO_LONG);
+            return policy.unclassified(Decision.Reason.TOO_LONG, e.getMessage());
         } catch (RuntimeException e) {
             LOG.warnf("Decision model failed, routing locally: %s", e.getMessage());
-            return policy.unclassified(Decision.Reason.KEV_ERROR);
+            return policy.unclassified(Decision.Reason.KEV_ERROR, e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

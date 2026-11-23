@@ -17,6 +17,7 @@ import java.util.List;
  * @param cloudProbability summed kev probability of the cloud-allowed levels, null if not classified
  * @param piiTypes         PII types above the PII threshold
  * @param classification   raw kev result, null if not classified
+ * @param detail           error text when not classified (too_long, kev_error), else null
  */
 public record Decision(
         PrivacyLevel privacyLevel,
@@ -26,7 +27,8 @@ public record Decision(
         String reason,
         Double cloudProbability,
         List<String> piiTypes,
-        Classification classification) {
+        Classification classification,
+        String detail) {
 
     /** Reason codes written to the log and returned to the client. */
     public static final class Reason {

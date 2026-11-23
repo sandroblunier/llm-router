@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
 
-/** Request and response bodies of the REST API. */
+/**
+ * Request and response bodies of the REST API.
+ */
 public final class Dtos {
 
     private Dtos() {
@@ -22,13 +24,14 @@ public final class Dtos {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Reasons(
             String reason,
+            String detail,
             Double cloudProbability,
             List<String> piiTypes,
             Map<String, Double> privacyProbabilities,
             Map<String, Double> complexityProbabilities) {
 
         static Reasons of(Decision d) {
-            return new Reasons(d.reason(), d.cloudProbability(), d.piiTypes(),
+            return new Reasons(d.reason(), d.detail(), d.cloudProbability(), d.piiTypes(),
                     d.classification() == null ? null : d.classification().privacyProbabilities(),
                     d.classification() == null ? null : d.classification().complexityProbabilities());
         }

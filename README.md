@@ -8,15 +8,17 @@ Die Antworten kommen von Ollama (lokal `gemma3:4b`, Cloud `gemma4:31b-cloud`).
 
 `router.decision.backend` wählt die Variante:
 
-| Wert | Aufruf | Wahrscheinlichkeit D0–D3 |
-|---|---|---|
-| `ollama` (Standard) | kev-Modell in Ollama, `POST /api/chat`, Temperatur 0, Antwort als JSON-Schema | aus den Token-Wahrscheinlichkeiten (`logprobs`) an der Stelle der Datenschutzstufe |
-| `kev-server` | kev-Python-Server, `POST /v1/systemone` | direkt von kev |
+| Wert | Modell | Aufruf | Wahrscheinlichkeit D0–D3 |
+|---|---|---|---|
+| `ollama` | textgenerierendes Modell in Ollama, Standard `gemma3:4b` | `POST /api/chat`, Temperatur 0, Antwort als JSON-Schema | aus den Token-Wahrscheinlichkeiten (`logprobs`) an der Stelle der Datenschutzstufe |
+| `kev-server` (Standard) | kev (Python-Server) | `POST /v1/systemone` | direkt von kev |
 
 Wichtig für `ollama`:
-- `router.decision.ollama.model` muss der Name aus `ollama list` sein (Platzhalter: `kev`).
-- `router.decision.ollama.num-ctx` muss zum Modell passen (`ollama show <modell>`).
-- Ollama muss `logprobs` liefern (neuere Ollama-Version). Ohne `logprobs` geht jede Anfrage lokal (Grund `kev_error`).
+- Das Modell muss Text erzeugen können: `ollama show <modell>` zeigt unter *Capabilities* `completion`.
+- **kev funktioniert hier nicht.** In Ollama fehlt kevs Klassifikationskopf; Ollama meldet «does not support chat». Für kev: `router.decision.backend=kev-server`.
+- Bei Modellen mit Denkmodus (z. B. `qwen3`): `router.decision.ollama.think=false`.
+- `router.decision.ollama.num-ctx` muss zum Modell passen.
+- Ollama muss `logprobs` liefern (neuere Ollama-Version). Ohne `logprobs` geht jede Anfrage lokal (Grund `kev_error`, Ursache in `reasons.detail`).
 - Der System-Prompt steht in `src/main/resources/decision-prompt.txt` (Richtlinie annotation_pilot).
 
 ## Ablauf
@@ -49,13 +51,13 @@ Gründe im Feld `reasons.reason`: `cloud_eligible`, `privacy_below_threshold`, `
 
 - Java 26 (z. B. Temurin 26: `brew install --cask temurin@26`) und Maven 3.9 (`brew install maven`); `JAVA_HOME` muss auf JDK 26 zeigen
 - Quarkus 3.40 LTS (Core-BOM `io.quarkus:quarkus-bom`)
-- Ollama mit den Modellen (kev-Modell: Name siehe `ollama list`):
+- Ollama mit den Modellen:
   ```bash
   ollama pull gemma3:4b
   ollama signin            # für Cloud-Modelle
   ollama pull gemma4:31b-cloud
   ```
-- Nur für `router.decision.backend=kev-server`: der kev-Server
+- kev-Server (Standard-Entscheidungsmodell, Port 8009)
   ```bash
   cd kev && uv sync --extra serve
   uv run --extra serve python -m kev.serve --run jaredpalmer/kev-4b --port 8009
@@ -66,7 +68,7 @@ Gründe im Feld `reasons.reason`: `cloud_eligible`, `privacy_below_threshold`, `
 ### Entwicklung
 
 ```bash
-mvn quarkus:dev -Drouter.decision.ollama.model=<kev-tag>   # Ollama auf localhost:11434, API-Key "dev-key"
+mvn quarkus:dev           # Ollama auf localhost:11434, API-Key "dev-key"
 ```
 
 ### Tests
@@ -144,9 +146,10 @@ Jeder Wert lässt sich per Umgebungsvariable setzen (z. B. `router.routing.cloud
 | Property | Standard | Bedeutung |
 |---|---|---|
 | `router.api-key.value` | `$ROUTER_API_KEY` | erwarteter API-Key |
-| `router.decision.backend` | `ollama` | `ollama` oder `kev-server` |
-| `router.decision.ollama.model` | `kev` | Ollama-Name des kev-Modells |
-| `router.decision.ollama.num-ctx` | `8192` | Kontext des kev-Modells |
+| `router.decision.backend` | `kev-server` | `kev-server` oder `ollama` |
+| `router.decision.ollama.model` | `gemma3:4b` | Entscheidungsmodell in Ollama |
+| `router.decision.ollama.think` | – | `false` für Modelle mit Denkmodus |
+| `router.decision.ollama.num-ctx` | `8192` | Kontext des Entscheidungsmodells |
 | `router.decision.ollama.reserved-tokens` | `2048` | Reserve für Prompt und Antwort; Rest = Eingabelimit |
 | `router.decision.ollama.prompt-file` | – | eigener System-Prompt statt `decision-prompt.txt` |
 | `router.kev.url` | `http://host.docker.internal:8009` | kev-Server |

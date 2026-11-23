@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * kev served by Ollama ({@code POST /api/chat}). Backend {@code ollama}.
+ * Text-generating decision model in Ollama ({@code POST /api/chat}), e.g. gemma3:4b. Backend {@code ollama}.
+ * kev itself cannot be used here: in Ollama it has no "completion" capability (classifier head missing).
  *
  * <p>One call, temperature 0, answer forced into a JSON schema
  * ({@code datenschutzstufe}, {@code pii_arten}, {@code komplexitaet}). The D0..D3 probabilities
@@ -74,6 +75,7 @@ public class OllamaDecisionModel implements DecisionModel {
         body.set("format", schema());
         body.put("logprobs", true);
         body.put("top_logprobs", c.topLogprobs());
+        c.think().ifPresent(t -> body.put("think", t));
         ObjectNode options = body.putObject("options");
         options.put("temperature", 0);
         options.put("num_ctx", c.numCtx());

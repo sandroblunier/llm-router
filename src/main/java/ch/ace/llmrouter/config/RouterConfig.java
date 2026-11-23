@@ -39,15 +39,21 @@ public interface RouterConfig {
 
     interface Decision {
         /** Which decision model to use: {@code ollama} (kev in Ollama) or {@code kev-server}. */
-        @WithDefault("ollama")
+        @WithDefault("kev-server")
         String backend();
 
         DecisionOllama ollama();
     }
 
     interface DecisionOllama {
-        /** Ollama tag of the kev model (see {@code ollama list}). */
+        /** Ollama tag of a text-generating decision model (see {@code ollama list}); needs capability "completion". */
         String model();
+
+        /**
+         * Ollama "think" flag. Unset: not sent (models without thinking). Set to false for thinking models
+         * such as qwen3, so no reasoning text is mixed into the answer and its logprobs.
+         */
+        Optional<Boolean> think();
 
         /** Context window passed to Ollama as num_ctx. */
         @WithDefault("8192")

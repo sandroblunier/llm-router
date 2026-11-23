@@ -63,13 +63,18 @@ public class RoutingPolicy {
             reason = Decision.Reason.COMPLEXITY_LOCAL;
         }
         return new Decision(c.privacyLevel(), c.complexity(), target, modelLookup.apply(target),
-                reason, cloudProbability, piiTypes, c);
+                reason, cloudProbability, piiTypes, c, null);
     }
 
     /** Decision for a request that could not be classified. Never goes to the cloud. */
     public Decision unclassified(String reason) {
+        return unclassified(reason, null);
+    }
+
+    /** Same as {@link #unclassified(String)} with the error text for log and response. */
+    public Decision unclassified(String reason, String detail) {
         Target target = Target.LOCAL_COMPLEX;
-        return new Decision(null, null, target, modelLookup.apply(target), reason, null, List.of(), null);
+        return new Decision(null, null, target, modelLookup.apply(target), reason, null, List.of(), null, detail);
     }
 
     double cloudProbability(Map<String, Double> privacyProbabilities) {

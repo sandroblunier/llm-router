@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Orchestrates the flow: decide, log, wait for feedback, forward, log. */
+/**
+ * Orchestrates the flow: decide, log, wait for feedback, forward, log.
+ */
 @Singleton
 public class RouterService {
 
@@ -52,7 +54,9 @@ public class RouterService {
         return RouteResponse.of(id, RequestStatus.PENDING_FEEDBACK, decision);
     }
 
-    /** @return empty if the id is unknown or expired */
+    /**
+     * @return empty if the id is unknown or expired
+     */
     public Optional<RouteResponse> feedback(String id, boolean ok) {
         Optional<PendingRequests.Pending> p = pending.take(id);
         if (p.isEmpty()) {
@@ -105,6 +109,7 @@ public class RouterService {
                 .target(d.target().name())
                 .model(d.model())
                 .reason(d.reason())
+                .error(d.detail())
                 .cloudProbability(d.cloudProbability())
                 .piiTypes(d.piiTypes())
                 .privacyProbabilities(c == null ? null : c.privacyProbabilities())
