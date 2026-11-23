@@ -27,6 +27,7 @@ public class WireMockResource implements QuarkusTestResourceLifecycleManager {
                     "router.kev.url", url,
                     "router.ollama.url", url,
                     "router.log.file", log.toString(),
+                    "router.evaluation.dir", Files.createTempDirectory("evaluations").toString(),
                     "router.api-key.enabled", "true",
                     "router.api-key.value", "test-key",
                     "router.kev.timeout", "5s",

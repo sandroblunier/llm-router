@@ -29,6 +29,8 @@ public interface RouterConfig {
 
     Log log();
 
+    Evaluation evaluation();
+
     interface ApiKey {
         @WithDefault("true")
         boolean enabled();
@@ -130,5 +132,14 @@ public interface RouterConfig {
 
     interface Log {
         String file();
+    }
+
+    interface Evaluation {
+        /** Rows evaluated at the same time; 1 = one after another (clean latency measurement). */
+        @WithDefault("1")
+        int parallelism();
+
+        /** Directory for finished results (&lt;id&gt;.json, without request text). */
+        String dir();
     }
 }

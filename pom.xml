@@ -16,6 +16,7 @@
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.version>3.40.1.2</quarkus.platform.version>
         <tika.version>2.9.2</tika.version>
+        <poi.version>5.2.5</poi.version>
         <wiremock.version>3.9.2</wiremock.version>
         <compiler-plugin.version>3.14.1</compiler-plugin.version>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
@@ -80,6 +81,13 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parser-text-module</artifactId>
             <version>${tika.version}</version>
+        </dependency>
+
+        <!-- Gold-set Excel files (same POI version as Tika 2.9.2) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
 
         <!-- Tests -->

@@ -79,10 +79,14 @@ mvn test                  # Unit-Tests + Integrationstests (WireMock ersetzt kev
 
 ### Docker
 
+Backend allein (dieser Ordner):
+
 ```bash
 ROUTER_API_KEY=geheim docker compose up --build
 ROUTER_API_KEY=geheim ./smoke-test.sh          # gegen echte kev- und Ollama-Dienste
 ```
+
+Backend und Frontend zusammen: `../docker-compose.yml` (siehe `../README.md`).
 
 Multi-Arch-Image (DGX Spark und amd64):
 
@@ -101,6 +105,11 @@ Alle Aufrufe brauchen den Header `X-API-Key`. Ausnahme: `/q/health`.
 | GET | `/logs/all` | alle Log-Einträge |
 | GET | `/logs/{id}` | alle Einträge einer Anfrage |
 | GET | `/logs/latest/{count}` | die letzten N Anfragen mit ihren Einträgen |
+| POST | `/evaluations` | Gold-Set (xlsx, Formularfeld `file`) hochladen und Evaluation starten (Apache POI) |
+| GET | `/evaluations/{id}` | Status, Zeilen und Zusammenfassung einer Evaluation |
+| GET | `/evaluations/{id}/events` | Live-Fortschritt (Server-Sent Events) |
+| POST | `/evaluations/{id}/cancel` | Evaluation abbrechen |
+| GET | `/evaluations/{id}/export?format=csv\|json` | Ergebnis als CSV oder JSON |
 | GET | `/q/health` | Health-Check |
 
 - `dryRun=true`: nur Entscheid, keine Weiterleitung, kein Warten auf Feedback.
@@ -131,6 +140,29 @@ curl -s -H "X-API-Key: dev-key" -H "Content-Type: application/json" \
   }
 }
 ```
+
+## Gold-Set-Evaluation (Backend-Job)
+
+Der Router testet ein Gold-Set (Excel im Format annotation_pilot) als Hintergrund-Job.
+Jede Zeile wird **einzeln** im `dryRun` beurteilt. Der Job läuft weiter, auch wenn der Browser geschlossen wird.
+
+| Methode | Pfad | Zweck |
+|---|---|---|
+| POST | `/evaluations` | xlsx hochladen (Formularfeld `file`), Job starten → `202` mit Job-Status; `409`, wenn schon ein Job läuft; `400` bei falscher Datei |
+| GET | `/evaluations/{id}` | Status, Zeilen und Zusammenfassung |
+| GET | `/evaluations/{id}/events` | Live-Fortschritt als Server-Sent Events (`status`, je Zeile `row`, am Ende `done`) |
+| POST | `/evaluations/{id}/cancel` | Job abbrechen |
+| GET | `/evaluations/{id}/export?format=csv\|json` | Export (CSV mit `;` und UTF-8-BOM für Excel; JSON mit `meta`, `summary`, `rows`) |
+
+- Excel: Blatt «Beschriftung», Pflichtspalten `nr` und `anfrage`; `datenschutzstufe`, `pii_arten`, `komplexitaet`, `grenzfall` sind optional.
+- Ergebnisse enthalten **keinen** Anfragetext. Fertige Jobs werden als `router.evaluation.dir/<id>.json` gespeichert und sind nach einem Neustart noch abrufbar.
+- Zusammenfassung: Genauigkeit Datenschutz und Komplexität, Konfusionsmatrizen, Anteil D1–D3 lokal, «falsch in die Cloud» (Gold D1–D3, Ziel CLOUD), Fehler, Latenz.
+- Die gleiche Berechnung gibt es im Frontend für den Browser-Modus (`EvaluationMath` ↔ `evaluation-logic.ts`).
+
+| Property | Standard | Bedeutung |
+|---|---|---|
+| `router.evaluation.parallelism` | `1` | Zeilen gleichzeitig (1 = nacheinander, saubere Latenzmessung) |
+| `router.evaluation.dir` | `/data/evaluations` | Ablage der Ergebnisse |
 
 ## Log
 
@@ -179,6 +211,7 @@ decision/   Entscheidungsmodelle (Ollama, kev-Server), logprobs, Routing-Regeln 
 routing/    Ablauf (RouterService), offene Anfragen, Anhänge
 llm/        LlmProvider-Schnittstelle, Ollama-Umsetzung
 log/        JSONL-Log mit Index
+evaluation/ Gold-Set lesen (Apache POI), Jobs, SSE, Export
 ```
 
 Später möglich: Anthropic- und OpenAI-Adapter über `LlmProvider`, Evaluationstool für das Gold-Set, Neubewertung bei NOK.
